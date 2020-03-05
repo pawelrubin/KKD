@@ -14,22 +14,27 @@ class EntropyAnalyzer:
         cond_stats: Dict[(int, int), int] = defaultdict(int)
 
         with open(filename, "br") as file:
-            for line in file:
-                for i, c in enumerate(line):
-                    stats[c] += 1
-                    cond_stats[(c, line[i - 1] if i > 0 else 0)] += 1
+            file_bytes = file.read()
+            for i, c in enumerate(file_bytes):
+                stats[c] += 1
+                cond_stats[(c, file_bytes[i - 1] if i > 0 else 0)] += 1
 
-        self.entropy = sum(-math.log2(v / size) * (v / size) for v in stats.values())
+        size_log = math.log2(size)
 
-        self.cond_entropy = sum(
-            v
-            / size
-            * sum(
-                vv / v * -math.log2(vv / v)
-                for kk, vv in cond_stats.items()
-                if kk[0] == k
+        self.entropy = (
+            sum(-(math.log2(v) - size_log) * v for v in stats.values()) / size
+        )
+
+        self.cond_entropy = (
+            sum(
+                sum(
+                    vv * -(math.log2(vv) - math.log2(v))
+                    for kk, vv in cond_stats.items()
+                    if kk[0] == k
+                )
+                for k, v in stats.items()
             )
-            for k, v in stats.items()
+            / size
         )
 
     def print(self) -> None:
