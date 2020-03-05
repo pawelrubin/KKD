@@ -20,22 +20,19 @@ class EntropyAnalyzer:
                 cond_stats[(c, file_bytes[i - 1] if i > 0 else 0)] += 1
 
         size_log = math.log2(size)
+        self.entropy = 0
+        self.cond_entropy = 0
 
-        self.entropy = (
-            sum(-(math.log2(v) - size_log) * v for v in stats.values()) / size
-        )
+        for k, v in stats.items():
+            v_log = math.log2(v)
+            self.entropy += -(v_log - size_log) * v
+            for kk, vv in cond_stats.items():
+                if kk[0] == k:
+                    self.cond_entropy += vv * -(math.log2(vv) - v_log)
+        
+        self.entropy /= size
+        self.cond_entropy /= size
 
-        self.cond_entropy = (
-            sum(
-                sum(
-                    vv * -(math.log2(vv) - math.log2(v))
-                    for kk, vv in cond_stats.items()
-                    if kk[0] == k
-                )
-                for k, v in stats.items()
-            )
-            / size
-        )
 
     def print(self) -> None:
         print(f"Results for {self.filename}")
