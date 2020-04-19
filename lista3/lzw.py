@@ -1,5 +1,5 @@
 import elias
-
+import fib
 
 def handle_padding(bitstring, mode="encode"):
     if mode == "encode":
@@ -52,16 +52,19 @@ def lzw_compress(in_file_name, out_file_name, coding):
 
 
 def lzw_decompress(in_file_name, out_file_name, coding):
+    from io import StringIO
+    
     # read bytes from file
     with open(in_file_name, "rb") as in_file:
         in_bitstring = handle_padding(to_bitstring(in_file.read()), mode="decode")
 
     dictionary = {i: format(i, "08b") for i in range(256)}
-    result = ""
 
     codes = coding.decode(in_bitstring)
     prev_code = codes[0]
     curr_char = ""
+    result = StringIO()
+    result.write(dictionary[prev_code])
 
     for code in codes[1:]:
         if code in dictionary:
@@ -69,10 +72,12 @@ def lzw_decompress(in_file_name, out_file_name, coding):
         else:
             entry = dictionary[prev_code] + curr_char
 
-        result += entry
+        result.write(entry)
         curr_char = entry[:8]
         dictionary[len(dictionary)] = dictionary[prev_code] + curr_char
         prev_code = code
+
+    result = result.getvalue()
 
     # write bytes to file
     with open(out_file_name, "wb") as out_file:
@@ -82,8 +87,31 @@ def lzw_decompress(in_file_name, out_file_name, coding):
 
 
 def main():
-    lzw_compress("tadek", "tadek.lzw", elias.Gamma)
-    lzw_decompress("tadek.lzw", "tadek.r", elias.Gamma)
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--compress", action="store_true")
+    group.add_argument("--decompress", action="store_true")
+    parser.add_argument("inputfile")
+    parser.add_argument("outputfile")
+    parser.add_argument("coding", choices=["gamma", "delta", "omega", "fib"])
+
+    args = parser.parse_args()
+
+    if args.coding == "gamma":
+        coding = elias.Gamma
+    elif args.coding == "delta":
+        coding = elias.Delta
+    elif args.coding == "omega":
+        coding = elias.Omega
+    else:
+        coding = fib.Fib
+
+    if args.compress:
+        lzw_compress(args.inputfile, args.outputfile, coding)
+    else:
+        lzw_decompress(args.inputfile, args.outputfile, coding)
 
 
 if __name__ == "__main__":
