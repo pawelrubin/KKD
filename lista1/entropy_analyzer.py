@@ -3,7 +3,7 @@ import math
 import os
 import sys
 from collections import defaultdict
-from typing import Dict
+from typing import Dict, Tuple
 
 
 class EntropyAnalyzer:
@@ -11,7 +11,7 @@ class EntropyAnalyzer:
         self.filename: str = filename
         size: int = os.stat(filename).st_size
         stats: Dict[int, int] = defaultdict(int)
-        cond_stats: Dict[(int, int), int] = defaultdict(int)
+        cond_stats: Dict[Tuple[int, int], int] = defaultdict(int)
 
         with open(filename, "br") as file:
             for i, c in enumerate(file_bytes := file.read()):
@@ -19,8 +19,8 @@ class EntropyAnalyzer:
                 cond_stats[(c, file_bytes[i - 1] if i > 0 else 0)] += 1
 
         size_log = math.log2(size)
-        self.entropy = 0
-        self.cond_entropy = 0
+        self.entropy = 0.0
+        self.cond_entropy = 0.0
 
         for curr_byte, curr_byte_count in stats.items():
             cb_log = math.log2(curr_byte_count)
