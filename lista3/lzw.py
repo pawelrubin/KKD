@@ -68,8 +68,7 @@ def lzw_decompress(in_file_name, out_file_name, coding):
     codes = list(map(lambda c: c - 1, coding.decode(in_bitstring)))
     prev_code = codes[0]
     curr_char = ""
-    result = StringIO()
-    result.write(dictionary[prev_code])
+    result = StringIO(initial_value=dictionary[prev_code])
 
     for code in codes[1:]:
         if code in dictionary:
