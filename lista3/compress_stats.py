@@ -1,29 +1,27 @@
-import math
+from math import log2
 from collections import defaultdict
 
 
-def entropy(freq, num_of_symbols):
-    return sum(
-        f / num_of_symbols * -math.log(f / num_of_symbols, 2) for f in freq.values()
-    )
+def entropy(symbols):
+    stats = defaultdict(int)
+    size = 0
 
+    for symbol in symbols:
+        stats[symbol] += 1
+        size += 1
 
-def get_frequencies(file_bytes):
-    freq = defaultdict(int)
-    for symbol in file_bytes:
-        freq[symbol] += 1
-    return freq
+    size_log = log2(size)
+    entropy = sum((size_log - log2(count)) * count for count in stats.values())
+
+    return entropy / size
 
 
 def stats(uncompressed: bytes, compressed: bytes):
-    freq = get_frequencies(uncompressed)
-    com_freq = get_frequencies(compressed)
-
     _len = len(uncompressed)
     com_len = len(compressed)
 
-    print(f"Entropy:                    {entropy(freq, _len)}")
-    print(f"Entropy after compression:  {entropy(com_freq, com_len)}")
+    print(f"Entropy:                    {entropy(uncompressed)}")
+    print(f"Entropy after compression:  {entropy(compressed)}")
     print(f"Size:                       {_len} bytes")
     print(f"Size after compression:     {com_len} bytes")
-    print(f"Compression ratio:          {com_len / _len}")
+    print(f"Compression ratio:          {_len / com_len}")
