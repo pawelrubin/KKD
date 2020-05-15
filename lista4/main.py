@@ -2,16 +2,14 @@ from collections import defaultdict
 from math import log2, log
 from pprint import pprint
 from sys import argv
-from typing import Dict
+from typing import Dict, Optional, Tuple
 
 from tga import TGAParser, BitMap
 from predictors import predictors, PredictionPixel, PredictionNeighboring
 from encoder import encode
 
 
-def bitmap_entropy(
-    pixels: BitMap, component=None,
-):
+def bitmap_entropy(pixels: BitMap, component: Optional[str] = None) -> float:
     stats: Dict[int, int] = defaultdict(int)
     size = 0
     for row in pixels:
@@ -31,7 +29,7 @@ def bitmap_entropy(
     return entropy / size
 
 
-def get_entropies(pixels: BitMap):
+def get_entropies(pixels: BitMap) -> Dict[str, float]:
     return {
         "general": bitmap_entropy(pixels, None),
         "red": bitmap_entropy(pixels, "red"),
@@ -40,7 +38,7 @@ def get_entropies(pixels: BitMap):
     }
 
 
-def main():
+def main() -> None:
     file = argv[1]
     pixels = TGAParser(file).get_pixels()
     predictors_entropies = {}
@@ -57,9 +55,8 @@ def main():
         pprint(entropies)
         print(31 * "-")
 
-    best_predictor = lambda stat: min(
-        predictors_entropies.items(), key=lambda predictor: predictor[1][stat]
-    )
+    def best_predictor(stat: str) -> Tuple[str, Dict[str, float]]:
+        return min(predictors_entropies.items(), key=lambda predictor: predictor[1][stat])
 
     print("--------Best predictors--------")
     print(f"general: {best_predictor('general')}")

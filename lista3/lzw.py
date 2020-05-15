@@ -1,9 +1,14 @@
+from typing import Literal, Type, Union
+
 import elias
 import fib
 import compress_stats
 
+Mode = Literal["encode", "decode"]
+Coding = Union[Type[elias.Gamma], Type[elias.Delta], Type[elias.Omega], Type[fib.Fib]]
 
-def handle_padding(bitstring, mode="encode"):
+
+def handle_padding(bitstring: str, mode: Mode = "encode") -> str:
     if mode == "encode":
         bitstring = "000" + bitstring
         if len(bitstring) % 8 != 0:
@@ -11,8 +16,10 @@ def handle_padding(bitstring, mode="encode"):
             bitstring += padding
             bitstring = format(len(padding), "03b") + bitstring[3:]
     elif mode == "decode":
-        padding = int(bitstring[:3], 2)
-        bitstring = bitstring[3:-padding] if padding > 0 else bitstring[3:]
+        padding_decoded = int(bitstring[:3], 2)
+        bitstring = (
+            bitstring[3:-padding_decoded] if padding_decoded > 0 else bitstring[3:]
+        )
     return bitstring
 
 
@@ -20,7 +27,9 @@ def to_bitstring(data: bytes) -> str:
     return "".join(format(byte, "08b") for byte in data)
 
 
-def lzw_compress(in_file_name, out_file_name, coding, stats=True):
+def lzw_compress(
+    in_file_name: str, out_file_name: str, coding: Coding, stats: bool = True
+) -> None:
     # read bytes from file
     with open(in_file_name, "rb") as in_file:
         in_bytes = in_file.read()
@@ -56,7 +65,7 @@ def lzw_compress(in_file_name, out_file_name, coding, stats=True):
         compress_stats.stats(in_bytes, out_bytes)
 
 
-def lzw_decompress(in_file_name, out_file_name, coding):
+def lzw_decompress(in_file_name: str, out_file_name: str, coding: Coding) -> None:
     from io import StringIO
 
     # read bytes from file
@@ -82,15 +91,15 @@ def lzw_decompress(in_file_name, out_file_name, coding):
         dictionary[len(dictionary)] = dictionary[prev_code] + curr_char
         prev_code = code
 
-    result = result.getvalue()
+    result_str = result.getvalue()
 
-    _bytes = bytes(int(result[i : i + 8], 2) for i in range(0, len(result), 8))
+    _bytes = bytes(int(result_str[i : i + 8], 2) for i in range(0, len(result_str), 8))
     # write bytes to file
     with open(out_file_name, "wb") as out_file:
         out_file.write(_bytes)
 
 
-def main():
+def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser()
@@ -104,14 +113,13 @@ def main():
 
     args = parser.parse_args()
 
+    coding: Coding = fib.Fib
     if args.coding == "gamma":
         coding = elias.Gamma
     elif args.coding == "delta":
         coding = elias.Delta
     elif args.coding == "omega":
         coding = elias.Omega
-    else:
-        coding = fib.Fib
 
     if args.compress:
         lzw_compress(args.inputfile, args.outputfile, coding, stats=not args.quiet)

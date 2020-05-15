@@ -7,7 +7,7 @@ EMPTY_PIXEL = PredictionPixel(0, 0, 0)
 
 def encode(
     pixels: BitMap, predictor: Callable[[PredictionNeighboring], PredictionPixel],
-):
+) -> BitMap:
     result: BitMap = [[] for _ in range(len(pixels))]
     for i, row in enumerate(pixels):
         for j, pixel in enumerate(row):

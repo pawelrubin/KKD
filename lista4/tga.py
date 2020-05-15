@@ -1,4 +1,3 @@
-import os
 from typing import List, Union
 
 from predictors import PredictionPixel

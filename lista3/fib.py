@@ -3,7 +3,7 @@ from typing import List
 
 class Fib:
     @staticmethod
-    def _encode_sequence(number):
+    def _encode_sequence(number: int) -> List[int]:
         sequence = []
         a, b = 0, 1
 
@@ -14,7 +14,7 @@ class Fib:
         return sequence[2:]
 
     @staticmethod
-    def _decode_sequence(number):
+    def _decode_sequence(number: int) -> List[int]:
         sequence = []
         a, b = 0, 1
 

@@ -7,7 +7,7 @@ from typing import Dict, Tuple
 
 
 class EntropyAnalyzer:
-    def __init__(self, filename: str):
+    def __init__(self, filename: str) -> None:
         self.filename: str = filename
         size: int = os.stat(filename).st_size
         stats: Dict[int, int] = defaultdict(int)

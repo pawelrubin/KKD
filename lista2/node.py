@@ -1,14 +1,16 @@
 from __future__ import annotations
 
+from typing import Optional
+
 
 class Node:
     def __init__(
         self,
         weight: int = 0,
-        symbol: int = None,
-        parent: Node = None,
-        left: Node = None,
-        right: Node = None,
+        symbol: Optional[int] = None,
+        parent: Optional[Node] = None,
+        left: Optional[Node] = None,
+        right: Optional[Node] = None,
     ):
         self.weight = weight
         self.symbol = symbol
@@ -17,7 +19,7 @@ class Node:
         self.right = right
 
     @property
-    def code(self):
+    def code(self) -> bytes:
         if self.parent:
             if self is self.parent.left:
                 return self.parent.code + b"0"

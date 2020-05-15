@@ -1,22 +1,23 @@
 import math
 from collections import defaultdict
-from typing import Dict, List
+from typing import DefaultDict, Dict, List, Optional
 
 from node import Node
 
 
 class Tree:
-    def __init__(self):
+    def __init__(self) -> None:
         self.root = self.NYT = Node()
-        self.nodes = []
-        self.seen = [None] * 256
+        self.nodes: List[Node] = []
+        self.seen: List[Optional[Node]] = [None] * 256
 
-    def _get_largest(self, weight):
+    def _get_largest(self, weight: int) -> Optional[Node]:
         for node in self.nodes:
             if node.weight == weight:
                 return node
+        return None
 
-    def _rebalance(self, node: Node):
+    def _rebalance(self, node: Node) -> None:
         while node is not None:
             largest = self._get_largest(node.weight)
 
@@ -30,7 +31,7 @@ class Tree:
             node.weight += 1
             node = node.parent
 
-    def _swap_nodes(self, node1, node2):
+    def _swap_nodes(self, node1: Node, node2: Node) -> None:
         i1, i2 = self.nodes.index(node1), self.nodes.index(node2)
         self.nodes[i1], self.nodes[i2] = self.nodes[i2], self.nodes[i1]
 
@@ -46,7 +47,7 @@ class Tree:
         else:
             node2.parent.right = node2
 
-    def update(self, symbol: int):
+    def update(self, symbol: int) -> None:
         node = self.seen[symbol]
 
         if node is None:
@@ -71,7 +72,7 @@ class Tree:
 
         self._rebalance(node)
 
-    def get_code(self, symbol: int):
+    def get_code(self, symbol: int) -> bytes:
         if (node := self.seen[symbol]) is None:
             return self.NYT.code + "{:08b}".format(symbol).encode()
         else:
@@ -82,7 +83,7 @@ def bitstring(data: bytes) -> str:
     return "".join(format(byte, "08b") for byte in data)
 
 
-def entropy(text):
+def entropy(text) -> float:
     stats = defaultdict(int)
 
     for c in text:
@@ -94,10 +95,10 @@ def entropy(text):
 
 
 class AdaptiveHuffman:
-    def __init__(self):
+    def __init__(self) -> None:
         self.tree = Tree()
 
-    def encode(self, data: bytes):
+    def encode(self, data: bytes) -> bytes:
         result = b"000"
         for c in data:
             code = self.tree.get_code(c)
@@ -110,7 +111,7 @@ class AdaptiveHuffman:
             result = format(len(padding), "03b").encode() + result[3:]
         return result
 
-    def decode(self, data: bytes):
+    def decode(self, data: bytes) -> str:
         bits = bitstring(data)
         padding = int(bits[:3], 2)
 
@@ -142,7 +143,7 @@ class AdaptiveHuffman:
         return result
 
 
-def main():
+def main() -> None:
     import argparse
 
     parser = argparse.ArgumentParser()

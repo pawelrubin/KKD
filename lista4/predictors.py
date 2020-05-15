@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
+from typing import Union
 
 
 @dataclass
@@ -7,26 +10,26 @@ class PredictionPixel:
     green: int
     blue: int
 
-    def __add__(self, other):
+    def __add__(self, other: PredictionPixel) -> PredictionPixel:
         return PredictionPixel(
             red=self.red + other.red,
             green=self.green + other.green,
             blue=self.blue + other.blue,
         )
 
-    def __sub__(self, other):
+    def __sub__(self, other: PredictionPixel) -> PredictionPixel:
         return PredictionPixel(
             red=self.red - other.red,
             green=self.green - other.green,
             blue=self.blue - other.blue,
         )
 
-    def __floordiv__(self, other):
+    def __floordiv__(self, other: int) -> PredictionPixel:
         return PredictionPixel(
             red=self.red // other, green=self.green // other, blue=self.blue // other
         )
 
-    def __mod__(self, other):
+    def __mod__(self, other: int) -> PredictionPixel:
         return PredictionPixel(
             red=self.red % other, green=self.green % other, blue=self.blue % other
         )
@@ -46,35 +49,35 @@ class PredictionNeighboring:
     c: PredictionPixel
 
 
-def _1(n: PredictionNeighboring):
+def _1(n: PredictionNeighboring) -> PredictionPixel:
     return n.b
 
 
-def _2(n: PredictionNeighboring):
+def _2(n: PredictionNeighboring) -> PredictionPixel:
     return n.a
 
 
-def _3(n: PredictionNeighboring):
+def _3(n: PredictionNeighboring) -> PredictionPixel:
     return n.c
 
 
-def _4(n: PredictionNeighboring):
+def _4(n: PredictionNeighboring) -> PredictionPixel:
     return n.b + n.a - n.c
 
 
-def _5(n: PredictionNeighboring):
+def _5(n: PredictionNeighboring) -> PredictionPixel:
     return n.b + (n.a - n.c) // 2
 
 
-def _6(n: PredictionNeighboring):
+def _6(n: PredictionNeighboring) -> PredictionPixel:
     return n.a + (n.b - n.c) // 2
 
 
-def _7(n: PredictionNeighboring):
+def _7(n: PredictionNeighboring) -> PredictionPixel:
     return (n.b + n.a) // 2
 
 
-def LOCO_I(n: PredictionNeighboring):
+def LOCO_I(n: PredictionNeighboring) -> PredictionPixel:
     """
     LOCO-I predictor.
     Calculated for every color component separately.
@@ -84,7 +87,7 @@ def LOCO_I(n: PredictionNeighboring):
     *note that the pixels [a][b] in the paper are swapped.
     """
 
-    def for_component(a, b, c):
+    def for_component(a: int, b: int, c: int) -> int:
         if c >= max(a, b):
             return min(a, b)
         if c <= min(a, b):

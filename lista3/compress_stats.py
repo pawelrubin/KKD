@@ -1,9 +1,10 @@
 from math import log2
 from collections import defaultdict
+from typing import DefaultDict
 
 
-def entropy(symbols):
-    stats = defaultdict(int)
+def entropy(symbols: bytes) -> float:
+    stats: DefaultDict[int, int] = defaultdict(int)
     size = 0
 
     for symbol in symbols:
@@ -16,7 +17,7 @@ def entropy(symbols):
     return entropy / size
 
 
-def stats(uncompressed: bytes, compressed: bytes):
+def stats(uncompressed: bytes, compressed: bytes) -> None:
     _len = len(uncompressed)
     com_len = len(compressed)
 
