@@ -15,7 +15,7 @@ def SNR(xs: List[Vector], mse: float) -> float:
         return sum(i ** 2 for i in xs)
 
     x_len = len(xs)
-    return (mse / x_len) * sum(map(square_sum, xs))
+    return sum(map(square_sum, xs)) / (mse * x_len)
 
 
 def quantify(bitmap: List[Vector], colors: int) -> List[Vector]:
